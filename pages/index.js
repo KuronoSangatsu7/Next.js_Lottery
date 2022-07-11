@@ -15,7 +15,6 @@ export default function Home() {
 
             <Header />
             <LotteryEntrance />
-            <div> Khello from Eendex</div>
         </div>
     )
 }

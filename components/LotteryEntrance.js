@@ -14,7 +14,11 @@ export default function LotteryEntrance() {
     const lotteryAddress = chainId in contractAddress ? contractAddress[chainId][0] : null
     const dispatch = useNotification()
 
-    const { runContractFunction: enterLottery } = useWeb3Contract({
+    const {
+        runContractFunction: enterLottery,
+        isLoading,
+        isFetching,
+    } = useWeb3Contract({
         abi: abi,
         contractAddress: lotteryAddress,
         functionName: "enterLottery",
@@ -73,27 +77,32 @@ export default function LotteryEntrance() {
     }
 
     return (
-        <>
-            <div>Lottery Entrance:</div>
+        <div className="p-5 text-xl">
             {lotteryAddress ? (
                 <div>
+                    <div className="m-3"><strong>Entrance Fee:</strong> {ethers.utils.formatEther(entranceFee)} <strong className="text-red-900">AVAX</strong></div>
+                    <div className="m-3"><strong>Current Number of players:</strong> {numPlayers}</div>
+                    <div className="m-3"><strong>Most Recent Winner:</strong> <span className="italic">{recentWinner}</span></div>
                     <button
+                        className="bg-stone-700 hover:bg-stone-800 text-slate-200 rounded px-3 py-2 disabled:opacity-50 disabled:hover:bg-stone-700 m-3"
                         onClick={async () => {
                             await enterLottery({
                                 onSuccess: handleSuccess,
                                 onError: (error) => console.log(error),
                             })
                         }}
+                        disabled={isLoading || isFetching}
                     >
-                        Enter Lottery
+                        {isLoading || isFetching ? (
+                            <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                        ) : (
+                            <div>Enter Lottery</div>
+                        )}
                     </button>
-                    <div>Entrance Fee: {ethers.utils.formatEther(entranceFee)} AVAX</div>
-                    <div>Current Number of players: {numPlayers}</div>
-                    <div>Most Recent Winner: {recentWinner}</div>
                 </div>
             ) : (
                 <div>Please switch to Fuji testnet</div>
             )}
-        </>
+        </div>
     )
 }

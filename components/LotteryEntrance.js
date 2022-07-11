@@ -7,6 +7,8 @@ import { useNotification } from "web3uikit"
 
 export default function LotteryEntrance() {
     const [entranceFee, setEntranceFee] = useState(0)
+    const [numPlayers, setNumPlayers] = useState(0)
+    const [recentWinner, setRecentWinner] = useState(0)
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
     const lotteryAddress = chainId in contractAddress ? contractAddress[chainId][0] : null
@@ -27,18 +29,37 @@ export default function LotteryEntrance() {
         params: {},
     })
 
-    useEffect(() => {
-        const updateUi = async () => {
-            const temp = (await getEntranceFee()).toString()
-            setEntranceFee(temp)
-        }
+    const { runContractFunction: getNumPlayers } = useWeb3Contract({
+        abi: abi,
+        contractAddress: lotteryAddress,
+        functionName: "getNumPlayers",
+        params: {},
+    })
 
+    const { runContractFunction: getRecentWinner } = useWeb3Contract({
+        abi: abi,
+        contractAddress: lotteryAddress,
+        functionName: "getRecentWinner",
+        params: {},
+    })
+
+    const updateUi = async () => {
+        const entranceFeeCall = (await getEntranceFee()).toString()
+        const numPlayersCall = (await getNumPlayers()).toString()
+        const recentWinnerCall = await getRecentWinner()
+        setEntranceFee(entranceFeeCall)
+        setNumPlayers(numPlayersCall)
+        setRecentWinner(recentWinnerCall)
+    }
+
+    useEffect(() => {
         isWeb3Enabled && updateUi()
     }, [isWeb3Enabled])
 
     const handleSuccess = async (tx) => {
         await tx.wait(1)
         handleNewNotification(tx)
+        updateUi()
     }
 
     const handleNewNotification = () => {
@@ -47,7 +68,7 @@ export default function LotteryEntrance() {
             message: "Transaction Complete!",
             title: "Transaction Notification",
             position: "topR",
-            icon: "bell"
+            icon: "bell",
         })
     }
 
@@ -66,7 +87,9 @@ export default function LotteryEntrance() {
                     >
                         Enter Lottery
                     </button>
-                    Entrance Fee: {ethers.utils.formatEther(entranceFee)} AVAX
+                    <div>Entrance Fee: {ethers.utils.formatEther(entranceFee)} AVAX</div>
+                    <div>Current Number of players: {numPlayers}</div>
+                    <div>Most Recent Winner: {recentWinner}</div>
                 </div>
             ) : (
                 <div>Please switch to Fuji testnet</div>

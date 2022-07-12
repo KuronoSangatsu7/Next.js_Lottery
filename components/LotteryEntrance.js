@@ -89,6 +89,10 @@ export default function LotteryEntrance() {
                             <strong>Current Number of players:</strong> {numPlayers}
                         </div>
                         <div className="m-3">
+                            <strong>Prize Pool:</strong> {ethers.utils.formatEther(entranceFee) * numPlayers}{" "}
+                            <strong className="text-red-900">AVAX</strong>
+                        </div>
+                        <div className="m-3">
                             <strong>Most Recent Winner:</strong>{" "}
                             <span className="italic">{recentWinner}</span>
                         </div>

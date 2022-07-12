@@ -1,4 +1,4 @@
-## ERC777 Operators:
+## Lottery:
 
 ### Overview:
 A simple UI for the Lottery contract (https://github.com/KuronoSangatsu7/Hardhat_Lottery).
